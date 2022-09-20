@@ -27,7 +27,7 @@ message LoginResponse{
 }
 
 message UserInfoRequest{
-   string Id = 1 ;
+   string token = 1 ;
 }
 
 message UserInfoResponse{

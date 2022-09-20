@@ -89,7 +89,7 @@ func UpdateAllTokens(signedToken string, userId primitive.ObjectID) {
 		Upsert: &upsert,
 	}
 
-	_, err := dataBase.ShoppingCartColliction.UpdateOne(
+	_, err := dataBase.UsersDB.UpdateOne(
 		ctx,
 		filter,
 		bson.D{

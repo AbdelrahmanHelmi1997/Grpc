@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"test/Middlewares"
 	"test/model"
 	"test/proto"
 
@@ -56,11 +55,16 @@ func main() {
 
 	})
 
-	var auth Middlewares.Auth
+	g.GET("GetUser", func(ctx *gin.Context) {
 
-	g.GET("GetUser/:id", auth.Auth, func(ctx *gin.Context) {
-		userId := ctx.Param("id")
-		req := &proto.UserInfoRequest{Id: userId}
+		userToken := ctx.Request.Header.Get("token")
+
+		if userToken == "" {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("No Authorization header provided")})
+			ctx.Abort()
+			return
+		}
+		req := &proto.UserInfoRequest{Token: userToken}
 
 		if response, err := client.GetUserInfo(ctx, req); err == nil {
 			ctx.JSON(http.StatusOK, gin.H{
@@ -76,5 +80,4 @@ func main() {
 	if err := g.Run(":8080"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
-
 }

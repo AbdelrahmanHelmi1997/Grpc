@@ -8,10 +8,8 @@ import (
 )
 
 func HashPassword(password string) string {
-	fmt.Println("error Here 11")
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	if err != nil {
-		fmt.Println("error Here 4")
 		log.Panic(err)
 	}
 

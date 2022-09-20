@@ -19,6 +19,7 @@ type server struct {
 }
 
 func main() {
+
 	dataBase.DB()
 	listener, err := net.Listen("tcp", ":4040")
 	if err != nil {
@@ -32,14 +33,12 @@ func main() {
 	if e := srv.Serve(listener); e != nil {
 		panic(e)
 	}
-
 }
-
 func (s *server) CreateUSer(ctx context.Context, request *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
 	var user model.User
 	user.FirstName, user.Username, user.Password = request.GetName(), request.GetUsername(), request.GetPassword()
 
-	count, err := dataBase.ShoppingCartColliction.CountDocuments(ctx, bson.M{"username": user.Username})
+	count, err := dataBase.UsersDB.CountDocuments(ctx, bson.M{"username": user.Username})
 	if err != nil {
 		return &proto.CreateUserResponse{Message: "Error while Checking user"}, nil
 	}
@@ -62,17 +61,18 @@ func (s *server) CreateUSer(ctx context.Context, request *proto.CreateUserReques
 		Token:     user.Token,
 	}
 
-	dataBase.ShoppingCartColliction.InsertOne(ctx, CreateUser)
+	dataBase.UsersDB.InsertOne(ctx, CreateUser)
 
 	return &proto.CreateUserResponse{Message: "Created"}, nil
 
 }
+
 func (s *server) Login(ctx context.Context, request *proto.LoginRequest) (*proto.LoginResponse, error) {
 	var user model.User
 	var foundUser model.User
 	user.Username, user.Password = request.GetUsername(), request.GetPassword()
 
-	err := dataBase.ShoppingCartColliction.FindOne(ctx, bson.M{"username": user.Username}).Decode(&foundUser)
+	err := dataBase.UsersDB.FindOne(ctx, bson.M{"username": user.Username}).Decode(&foundUser)
 	if err != nil {
 		return &proto.LoginResponse{Message: "Email is invalid"}, nil
 	}
@@ -87,7 +87,7 @@ func (s *server) Login(ctx context.Context, request *proto.LoginRequest) (*proto
 	token, _ := Helper.GenerateAllTokens(foundUser.Username, foundUser.FirstName)
 
 	Helper.UpdateAllTokens(token, foundUser.ID)
-	err = dataBase.ShoppingCartColliction.FindOne(ctx, bson.M{"_id": foundUser.ID}).Decode(&foundUser)
+	err = dataBase.UsersDB.FindOne(ctx, bson.M{"_id": foundUser.ID}).Decode(&foundUser)
 
 	return &proto.LoginResponse{Message: "successs", Token: foundUser.Token}, nil
 
@@ -95,10 +95,8 @@ func (s *server) Login(ctx context.Context, request *proto.LoginRequest) (*proto
 
 func (s *server) GetUserInfo(ctx context.Context, request *proto.UserInfoRequest) (*proto.UserInfoResponse, error) {
 	var user model.User
-	objId, _ := primitive.ObjectIDFromHex(request.GetId())
-	user.ID = objId
-
-	err := dataBase.ShoppingCartColliction.FindOne(ctx, bson.M{"_id": objId}).Decode(&user)
+	user.Token = request.GetToken()
+	err := dataBase.UsersDB.FindOne(ctx, bson.M{"token": user.Token}).Decode(&user)
 
 	if err != nil {
 		return &proto.UserInfoResponse{Message: "User Not Found"}, nil
