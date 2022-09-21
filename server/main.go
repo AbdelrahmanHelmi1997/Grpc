@@ -37,7 +37,7 @@ func main() {
 
 	}
 }
-func (s *server) CreateUSer(ctx context.Context, request *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
+func (s *server) CreateUser(ctx context.Context, request *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
 	var user model.User
 	user.FirstName, user.Username, user.Password = request.GetName(), request.GetUsername(), request.GetPassword()
 
