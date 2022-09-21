@@ -9,11 +9,12 @@ message CreateUserRequest {
     string name  = 1;
     string username = 2;
     string password = 3 ;
-    string token = 4 ;
+    
 }
 
 message CreateUserResponse{
     string message = 1 ;
+    string token = 2;
 }
 
 message LoginRequest{
@@ -27,17 +28,18 @@ message LoginResponse{
 }
 
 message UserInfoRequest{
-   string token = 1 ;
+   
 }
 
 message UserInfoResponse{
     string message =1 ;
-    string name = 2;
-    string usernasme = 3;
+    string id =2 ;
+    string name = 3;
+    string username = 4;
 }
 
 service User{
-    rpc CreateUSer(CreateUserRequest) returns (CreateUserResponse){}
+    rpc CreateUser(CreateUserRequest) returns (CreateUserResponse){}
     rpc Login(LoginRequest) returns (LoginResponse) {}
     rpc GetUserInfo(UserInfoRequest) returns (UserInfoResponse){}
 

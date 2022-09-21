@@ -1,21 +1,18 @@
 package Helper
 
 import (
-	"context"
 	"fmt"
 	"log"
 	"os"
-	"test/dataBase"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
-	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // SignedDetails
 type SignedDetails struct {
+	ID         primitive.ObjectID
 	Username   string
 	First_name string
 	jwt.StandardClaims
@@ -23,8 +20,9 @@ type SignedDetails struct {
 
 var SECRET_KEY string = os.Getenv("SECRET_KEY")
 
-func GenerateAllTokens(username string, firstName string) (signedToken string, err error) {
+func GenerateAllTokens(id primitive.ObjectID, username string, firstName string) (signedToken string, err error) {
 	claims := &SignedDetails{
+		ID:         id,
 		Username:   username,
 		First_name: firstName,
 
@@ -71,38 +69,4 @@ func ValidateToken(signedToken string) (claims *SignedDetails, msg string) {
 	}
 
 	return claims, msg
-}
-
-func UpdateAllTokens(signedToken string, userId primitive.ObjectID) {
-	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
-
-	var updateObj primitive.D
-
-	updateObj = append(updateObj, bson.E{"token", signedToken})
-
-	Updated_at, _ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
-	updateObj = append(updateObj, bson.E{"updated_at", Updated_at})
-
-	upsert := true
-	filter := bson.M{"_id": userId}
-	opt := options.UpdateOptions{
-		Upsert: &upsert,
-	}
-
-	_, err := dataBase.UsersDB.UpdateOne(
-		ctx,
-		filter,
-		bson.D{
-			{"$set", updateObj},
-		},
-		&opt,
-	)
-	defer cancel()
-
-	if err != nil {
-		log.Panic(err)
-		return
-	}
-
-	return
 }
