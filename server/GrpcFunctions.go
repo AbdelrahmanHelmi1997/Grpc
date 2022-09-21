@@ -1,8 +1,7 @@
-package main
+package server
 
 import (
 	"context"
-	"net"
 	"test/Helper"
 	"test/dataBase"
 	"test/model"
@@ -10,34 +9,10 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
-	"google.golang.org/grpc/reflection"
 )
 
-type server struct {
-	proto.UnimplementedUserServer
-}
-
-func main() {
-
-	dataBase.DB()
-
-	listener, err := net.Listen("tcp", ":4040")
-	if err != nil {
-		panic(err)
-	}
-
-	srv := grpc.NewServer()
-	proto.RegisterUserServer(srv, &server{})
-	reflection.Register(srv)
-
-	if e := srv.Serve(listener); e != nil {
-		panic(e)
-
-	}
-}
-func (s *server) CreateUser(ctx context.Context, request *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
+func (s *Server) CreateUser(ctx context.Context, request *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
 	var user model.User
 	var foundUser model.User
 	user.FirstName, user.Username, user.Password = request.GetName(), request.GetUsername(), request.GetPassword()
@@ -62,21 +37,19 @@ func (s *server) CreateUser(ctx context.Context, request *proto.CreateUserReques
 	}
 
 	dataBase.UsersDB.InsertOne(ctx, CreateUser)
-
 	dataBase.UsersDB.FindOne(ctx, bson.M{"username": user.Username}).Decode(&foundUser)
-
 	token, _ := Helper.GenerateAllTokens(foundUser.ID, foundUser.Username, foundUser.FirstName)
-
 	return &proto.CreateUserResponse{Message: "Created", Token: token}, nil
 
 }
 
-func (s *server) Login(ctx context.Context, request *proto.LoginRequest) (*proto.LoginResponse, error) {
+func (s *Server) Login(ctx context.Context, request *proto.LoginRequest) (*proto.LoginResponse, error) {
 	var user model.User
 	var foundUser model.User
 	user.Username, user.Password = request.GetUsername(), request.GetPassword()
 
 	err := dataBase.UsersDB.FindOne(ctx, bson.M{"username": user.Username}).Decode(&foundUser)
+
 	if err != nil {
 		return &proto.LoginResponse{Message: "Email is invalid"}, nil
 	}
@@ -89,17 +62,17 @@ func (s *server) Login(ctx context.Context, request *proto.LoginRequest) (*proto
 	}
 
 	token, _ := Helper.GenerateAllTokens(foundUser.ID, foundUser.Username, foundUser.FirstName)
-
 	return &proto.LoginResponse{Message: "successs", Token: token}, nil
 
 }
 
-func (s *server) GetUserInfo(ctx context.Context, request *proto.UserInfoRequest) (*proto.UserInfoResponse, error) {
+func (s *Server) GetUserInfo(ctx context.Context, request *proto.UserInfoRequest) (*proto.UserInfoResponse, error) {
 	var values []string
 	var AccessToken string
 	var user model.User
 
 	md, ok := metadata.FromIncomingContext(ctx)
+
 	if ok {
 		values = md.Get("auth")
 	}
@@ -109,12 +82,12 @@ func (s *server) GetUserInfo(ctx context.Context, request *proto.UserInfoRequest
 	}
 
 	claims, _ := Helper.ValidateToken(AccessToken)
-
 	err := dataBase.UsersDB.FindOne(ctx, bson.M{"_id": claims.ID}).Decode(&user)
 
 	if err != nil {
 		return &proto.UserInfoResponse{Message: "User Not Found"}, nil
 	}
+
 	return &proto.UserInfoResponse{Message: "Success", Id: user.ID.Hex(), Name: user.FirstName, Username: user.Username}, nil
 
 }
