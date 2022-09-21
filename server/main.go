@@ -39,6 +39,7 @@ func main() {
 }
 func (s *server) CreateUser(ctx context.Context, request *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
 	var user model.User
+	var foundUser model.User
 	user.FirstName, user.Username, user.Password = request.GetName(), request.GetUsername(), request.GetPassword()
 
 	count, err := dataBase.UsersDB.CountDocuments(ctx, bson.M{"username": user.Username})
@@ -62,7 +63,9 @@ func (s *server) CreateUser(ctx context.Context, request *proto.CreateUserReques
 
 	dataBase.UsersDB.InsertOne(ctx, CreateUser)
 
-	token, _ := Helper.GenerateAllTokens(user.ID, user.Username, user.FirstName)
+	dataBase.UsersDB.FindOne(ctx, bson.M{"username": user.Username}).Decode(&foundUser)
+
+	token, _ := Helper.GenerateAllTokens(foundUser.ID, foundUser.Username, foundUser.FirstName)
 
 	return &proto.CreateUserResponse{Message: "Created", Token: token}, nil
 
