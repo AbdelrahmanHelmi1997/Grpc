@@ -8,5 +8,5 @@
   
   - "Login" ---> takes user's credentials as a request and search for the user in the DataBase by user name and when find the user returns Access token
   
-  - "GetUserInfo" -----> Takes Access token as MetaData and extract user's Id from the token and search from user in DataBase and returns user's saved data
+  - "GetUserInfo" -----> Takes Access token as MetaData and extract user's Id from the token and search for user in DataBase and returns user's saved data
 
