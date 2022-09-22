@@ -10,6 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 )
 
 func (s *Server) CreateUser(ctx context.Context, request *proto.CreateUserRequest) (*proto.CreateUserResponse, error) {
@@ -19,14 +20,14 @@ func (s *Server) CreateUser(ctx context.Context, request *proto.CreateUserReques
 
 	count, err := dataBase.UsersDB.CountDocuments(ctx, bson.M{"username": user.Username})
 	if err != nil {
-		return &proto.CreateUserResponse{Message: "Error while Checking user"}, nil
+		return nil, status.Error(409, "Error while Checking user")
 	}
 
 	password := Helper.HashPassword(user.Password)
 	user.Password = password
 
 	if count > 0 {
-		return &proto.CreateUserResponse{Message: "User is already exsits"}, nil
+		return nil, status.Error(409, "User already exists")
 	}
 
 	CreateUser := model.User{
@@ -51,14 +52,14 @@ func (s *Server) Login(ctx context.Context, request *proto.LoginRequest) (*proto
 	err := dataBase.UsersDB.FindOne(ctx, bson.M{"username": user.Username}).Decode(&foundUser)
 
 	if err != nil {
-		return &proto.LoginResponse{Message: "Email is invalid"}, nil
+		return nil, status.Error(400, "Username is incorrect")
 	}
 
 	passwordIsValid, _ := Helper.VerifyPassword(user.Password, foundUser.Password)
 
 	if passwordIsValid != true {
 
-		return &proto.LoginResponse{Message: "Password is Wrong"}, nil
+		return nil, status.Error(400, "Password is incorrect")
 	}
 
 	token, _ := Helper.GenerateAllTokens(foundUser.ID, foundUser.Username, foundUser.FirstName)
@@ -67,25 +68,25 @@ func (s *Server) Login(ctx context.Context, request *proto.LoginRequest) (*proto
 }
 
 func (s *Server) GetUserInfo(ctx context.Context, request *proto.UserInfoRequest) (*proto.UserInfoResponse, error) {
-	var values []string
+	var metaDataArray []string
 	var AccessToken string
 	var user model.User
 
 	md, ok := metadata.FromIncomingContext(ctx)
 
 	if ok {
-		values = md.Get("auth")
+		metaDataArray = md.Get("auth")
 	}
 
-	if len(values) > 0 {
-		AccessToken = values[0]
+	if len(metaDataArray) > 0 {
+		AccessToken = metaDataArray[0]
 	}
 
 	claims, _ := Helper.ValidateToken(AccessToken)
 	err := dataBase.UsersDB.FindOne(ctx, bson.M{"_id": claims.ID}).Decode(&user)
 
 	if err != nil {
-		return &proto.UserInfoResponse{Message: "User Not Found"}, nil
+		return nil, status.Error(400, "User not found")
 	}
 
 	return &proto.UserInfoResponse{Message: "Success", Id: user.ID.Hex(), Name: user.FirstName, Username: user.Username}, nil
