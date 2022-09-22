@@ -55,7 +55,7 @@ func (s *Server) Login(ctx context.Context, request *proto.LoginRequest) (*proto
 		return nil, status.Error(400, "Username is incorrect")
 	}
 
-	passwordIsValid, _ := Helper.VerifyPassword(user.Password, foundUser.Password)
+	passwordIsValid := Helper.VerifyPassword(user.Password, foundUser.Password)
 
 	if passwordIsValid != true {
 
