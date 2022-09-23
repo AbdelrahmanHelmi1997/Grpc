@@ -82,7 +82,11 @@ func (s *Server) GetUserInfo(ctx context.Context, request *proto.UserInfoRequest
 		AccessToken = metaDataArray[0]
 	}
 
-	claims, _ := Helper.ValidateToken(AccessToken)
+	claims, msg := Helper.ValidateToken(AccessToken)
+
+	if msg != "" {
+		return nil, status.Error(403, msg)
+	}
 	err := dataBase.UsersDB.FindOne(ctx, bson.M{"_id": claims.ID}).Decode(&user)
 
 	if err != nil {
