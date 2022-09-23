@@ -20,7 +20,7 @@ func (s *Server) CreateUser(ctx context.Context, request *proto.CreateUserReques
 
 	count, err := dataBase.UsersDB.CountDocuments(ctx, bson.M{"username": user.Username})
 	if err != nil {
-		return nil, status.Error(409, "Error while Checking user")
+		return nil, status.Error(500, "Error while Checking user")
 	}
 
 	if count > 0 {
