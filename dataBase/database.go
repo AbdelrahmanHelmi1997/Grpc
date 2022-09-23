@@ -21,7 +21,7 @@ func DB() {
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 
 	if err != nil {
-		log.Fatal("mongoshit : ", err)
+		log.Fatal("", err)
 	}
 
 	fmt.Println("Mongo Connection Success")
