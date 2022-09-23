@@ -23,12 +23,12 @@ func (s *Server) CreateUser(ctx context.Context, request *proto.CreateUserReques
 		return nil, status.Error(409, "Error while Checking user")
 	}
 
-	password := Helper.HashPassword(user.Password)
-	user.Password = password
-
 	if count > 0 {
 		return nil, status.Error(409, "User already exists")
 	}
+
+	password := Helper.HashPassword(user.Password)
+	user.Password = password
 
 	CreateUser := model.User{
 		ID:        primitive.NewObjectID(),
