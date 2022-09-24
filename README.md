@@ -3,11 +3,13 @@
 
 #Server Folder
 
-- The server have three functions :
+-**GrpcFunctions.go**
 
-  - "CreateUser" ---> Which takes the request and create a user and save him in the DataBase and returns Access token for the user
+  - The server have three functions :
+
+    - "CreateUser" ---> Which takes the request and create a user and save him in the DataBase and returns Access token for the user
   
-  - "Login" ---> takes user's credentials as a request and search for the user in the DataBase by user name and when find the user returns Access token
+    - "Login" ---> takes user's credentials as a request and search for the user in the DataBase by user name and when find the user returns Access token
   
-  - "GetUserInfo" -----> Takes Access token as MetaData and extract user's Id from the token and search for user in DataBase and returns user's saved data
+    - "GetUserInfo" -----> Takes Access token as MetaData and extract user's Id from the token and search for user in DataBase and returns user's saved data
 
