@@ -6,7 +6,7 @@
 
 -**GrpcFunctions.go**
 
-  - The server have three functions :
+- The server have three functions :
 
     - "CreateUser" ---> Which takes the request and create a user and save him in the DataBase and returns Access token for the user
   
@@ -16,6 +16,6 @@
 
 -**GrpcConnection.go**
 
-   -This file have one funtion "GrpcServerConnection" which helps me to connect with the local server I created 
+-This file have one funtion "GrpcServerConnection" which helps me to connect with the local server I created 
   
   --------------------------------------------------------------------------------------------------------------------------------------------------------
