@@ -38,11 +38,13 @@
  
      -HashPassword --> which hash the password the came with the user's request "When creating"
      
-     -Verify Password ---> used to compare between the hashed password in the database and the password came with the login request and validate that the password is correct 
+     -Verify Password --> used to compare between the hashed password in the database and the password came with the login request and validate that the password is correct 
      
 -#**HelperToken.go**
 
-   -
+   -GenerateAllToken--> Used to generate a token for the useer
+   
+   -ValidateToken--> Used to validate the token formate and check if the token is expired or not
 
 
 
