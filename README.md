@@ -1,6 +1,7 @@
 # GrpcServer
-
 - Grpc server used to create user , login user  & get user info
+
+#Server Folder
 
 - The server have three functions :
 
