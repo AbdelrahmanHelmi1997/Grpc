@@ -16,6 +16,6 @@
 
 -**GrpcConnection.go**
 
-  -This file have one funtion "GrpcServerConnection" which helps me to connect with the local server I created 
+     -This file have one funtion "GrpcServerConnection" which helps me to connect with the local server I created 
   
   --------------------------------------------------------------------------------------------------------------------------------------------------------
