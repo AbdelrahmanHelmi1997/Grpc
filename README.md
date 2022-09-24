@@ -13,3 +13,7 @@
   
     - "GetUserInfo" -----> Takes Access token as MetaData and extract user's Id from the token and search for user in DataBase and returns user's saved data
 
+-**GrpcConnection.go**
+  -This file have one funtion "GrpcServerConnection" which helps me to connect with the local server I created 
+  
+  --------------------------------------------------------------------------------------------------------------------------------------------------------
