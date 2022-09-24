@@ -1,7 +1,8 @@
 # GrpcServer
 - Grpc server used to create user , login user  & get user info
 
-#Server Folder
+#**Server Folder**
+--------------------
 
 -**GrpcFunctions.go**
 
