@@ -19,3 +19,11 @@
    -This file have one funtion "GrpcServerConnection" which helps me to connect with the local server I created 
   
   --------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#**dataBase Folder**
+----------------------
+
+**database.go**
+-In this file I create DB() funtion which's helps me to connect with mongodb
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
